@@ -1,0 +1,231 @@
+curl -XPUT http://localhost:9200/ezview -d '{
+  "settings": {
+      "index.number_of_shards": 16,
+      "index.number_of_replicas": 1,
+      "index.compound_format": "false",
+      "index.compound_on_flush": "false"
+    },
+
+"mappings": {
+  "b_bk_jgcl": {
+    "_all": {
+      "enabled": false
+    },
+    "_field_names": {
+      "enabled": false
+    },
+    "_source": {
+      "enabled": true
+    },
+    "dynamic": "strict",
+    "_timestamp": {
+      "store": true,
+      "enabled": true
+    },
+  "properties": {
+      "JLBH": {
+        "index": "not_analyzed",
+        "type": "string",
+        "store": false
+      },
+      "TPLX": {
+        "index": "no",
+        "type": "string",
+        "store": false
+      },
+      "HPZL": {
+        "index": "no",
+        "type": "long",
+        "store": false
+      },
+      "SBBH": {
+        "index": "not_analyzed",
+        "type": "string",
+        "store": false
+      },
+      "CLBJ": {
+        "index": "no",
+        "type": "string",
+        "store": false
+      },
+      "JLLB": {
+        "index": "not_analyzed",
+        "type": "string",
+        "store": false
+      },
+      "BZWZDM": {
+        "index": "not_analyzed",
+        "type": "string",
+        "store": false
+      },
+      "ZDXS": {
+        "index": "no",
+        "type": "string",
+        "store": false
+      },
+      "ZGXS": {
+        "index": "no",
+        "type": "string",
+        "store": false
+      },
+      "BZ": {
+        "index": "no",
+        "type": "string",
+        "store": false
+      },
+      "TPSL": {
+        "index": "no",
+        "type": "long",
+        "store": false
+      },
+      "HPHM": {
+        "index": "not_analyzed",
+        "type": "string",
+        "store": false
+      },
+      "JGSJ_M": {
+        "index": "not_analyzed",
+        "type": "long",
+        "store": false
+      },
+      "JGSJ_L": {
+        "index": "no",
+        "type": "long",
+        "store": false
+      },
+      "HPYS": {
+        "index": "not_analyzed",
+        "type": "integer",
+        "store": false
+      },
+      "CLLX": {
+        "index": "no",
+        "type": "long",
+        "store": false
+      },
+      "CLSD": {
+        "index": "not_analyzed",
+        "type": "float",
+        "store": false
+      },
+      "TJBJ": {
+        "index": "no",
+        "type": "string",
+        "store": false
+      },
+      "BZ3": {
+        "index": "no",
+        "type": "string",
+        "store": false
+      },
+      "SFBFBJ": {
+        "index": "no",
+        "type": "string",
+        "store": false
+      },
+      "BZ2": {
+        "index": "no",
+        "type": "string",
+        "store": false
+      },
+      "XSFX": {
+        "index": "no",
+        "type": "string",
+        "store": false
+      },
+      "HDSJ": {
+        "index": "not_analyzed",
+        "type": "string",
+        "store": false
+      },
+      "JGSJ_H": {
+        "index": "not_analyzed",
+        "type": "long",
+        "store": false
+      },
+      "SHBJ": {
+        "index": "no",
+        "type": "string",
+        "store": false
+      },
+      "CWKC": {
+        "index": "no",
+        "type": "string",
+        "store": false
+      },
+      "CCLX": {
+        "index": "no",
+        "type": "string",
+        "store": false
+      },
+      "FXBH": {
+        "index": "not_analyzed",
+        "type": "string",
+        "store": false
+      },
+      "HPWZ": {
+        "index": "no",
+        "type": "string",
+        "store": false
+      },
+      "JGSJ": {
+        "index": "not_analyzed",
+        "type": "date",
+        "format": "yyyy-MM-dd HH:mm:ss.SSS",
+        "store": false,
+        "precision_step": 8,
+        "doc_values": true
+      },
+      "ZFBJ": {
+        "index": "no",
+        "type": "string",
+        "store": false
+      },
+      "CDBH": {
+        "index": "not_analyzed",
+        "type": "integer",
+        "store": false
+      },
+      "YZYS": {
+        "index": "no",
+        "type": "string",
+        "store": false
+      },
+      "TZTP": {
+        "index": "no",
+        "type": "string",
+        "store": false
+      },
+      "JLLX": {
+        "index": "no",
+        "type": "string",
+        "store": false
+      },
+      "CSYS": {
+        "index": "not_analyzed",
+        "type": "integer",
+        "store": false
+      },
+      "XRSJ": {
+        "index": "no",
+        "type": "string",
+        "store": false
+      },
+      "CSBJ": {
+        "index": "no",
+        "type": "string",
+        "store": false
+      },
+      "SJLY": {
+        "index": "no",
+        "type": "string",
+        "store": false
+      }
+    }
+  }
+}
+}'
+
+curl -XPUT http://localhost:9200/ezview/_alias/jgcl_read
+
+curl -XPUT http://localhost:9200/ezview/_alias/jgcl_write
