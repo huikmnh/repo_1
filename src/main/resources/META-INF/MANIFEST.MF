@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+X-Compile-Elasticsearch-Version: 5.4.0
+Implementation-Title: org.elasticsearch#core;5.4.0
+Module-Origin: git@github.com:elastic/elasticsearch.git
+Build-Date: 2017-04-28T17:44:43.767Z
+Implementation-Version: 5.4.0
+Built-By: vagrant
+Change: 780f8c4
+Module-Source: /core
+Branch: 780f8c429c5b945035c887ec93a64579cc1d0f20
+Built-Status: integration
+Gradle-Version: 3.3
+Built-OS: Linux
+X-Compile-Target-JDK: 1.8
+X-Compile-Elasticsearch-Snapshot: false
+X-Compile-Lucene-Version: 6.5.0
+X-Compile-Source-JDK: 1.8
+Created-By: 1.8.0_121-8u121-b13-0ubuntu1.16.04.2-b13 (Oracle Corporati
+ on)
+Build-Java-Version: 1.8
+
