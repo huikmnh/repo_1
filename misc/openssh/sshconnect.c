@@ -904,6 +904,7 @@ check_host_key(char *hostname, struct sockaddr *hostaddr, u_short port,
 		if (want_cert && !check_host_cert(hostname, host_key))
 			goto fail;
 		if (options.check_host_ip && ip_status == HOST_NEW) {
+/*
 			if (readonly || want_cert)
 				logit("%s host key for IP address "
 				    "'%.128s' not in list of known hosts.",
@@ -918,6 +919,7 @@ check_host_key(char *hostname, struct sockaddr *hostaddr, u_short port,
 				logit("Warning: Permanently added the %s host "
 				    "key for IP address '%.128s' to the list "
 				    "of known hosts.", type, ip);
+*/
 		} else if (options.visual_host_key) {
 			fp = sshkey_fingerprint(host_key,
 			    options.fingerprint_hash, SSH_FP_DEFAULT);
@@ -993,8 +995,8 @@ check_host_key(char *hostname, struct sockaddr *hostaddr, u_short port,
 			    msg2);
 			free(ra);
 			free(fp);
-			if (!confirm(msg))
-				goto fail;
+			//if (!confirm(msg))
+			//	goto fail;
 			hostkey_trusted = 1; /* user explicitly confirmed */
 		}
 		/*
@@ -1002,21 +1004,21 @@ check_host_key(char *hostname, struct sockaddr *hostaddr, u_short port,
 		 * local known_hosts file.
 		 */
 		if (options.check_host_ip && ip_status == HOST_NEW) {
+		break;
 			snprintf(hostline, sizeof(hostline), "%s,%s", host, ip);
 			hostp = hostline;
 			if (options.hash_known_hosts) {
-				/* Add hash of host and IP separately */
 				r = add_host_to_hostfile(user_hostfiles[0],
 				    host, host_key, options.hash_known_hosts) &&
 				    add_host_to_hostfile(user_hostfiles[0], ip,
 				    host_key, options.hash_known_hosts);
 			} else {
-				/* Add unhashed "host,ip" */
 				r = add_host_to_hostfile(user_hostfiles[0],
 				    hostline, host_key,
 				    options.hash_known_hosts);
 			}
 		} else {
+		break;
 			r = add_host_to_hostfile(user_hostfiles[0], host,
 			    host_key, options.hash_known_hosts);
 			hostp = host;

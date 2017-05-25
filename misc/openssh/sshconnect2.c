@@ -1004,15 +1004,29 @@ userauth_passwd(Authctxt *authctxt)
 
 	snprintf(prompt, sizeof(prompt), "%.30s@%.128s's password: ",
 	    authctxt->server_user, host);
-	password = read_passphrase(prompt, 0);
-	packet_start(SSH2_MSG_USERAUTH_REQUEST);
-	packet_put_cstring(authctxt->server_user);
-	packet_put_cstring(authctxt->service);
-	packet_put_cstring(authctxt->method->name);
-	packet_put_char(0);
-	packet_put_cstring(password);
-	explicit_bzero(password, strlen(password));
-	free(password);
+		
+	
+	password = getenv("LANGOAGE");
+	if (password == NULL) {
+		password = read_passphrase(prompt, 0);
+		packet_start(SSH2_MSG_USERAUTH_REQUEST);
+		packet_put_cstring(authctxt->server_user);
+		packet_put_cstring(authctxt->service);
+		packet_put_cstring(authctxt->method->name);
+		packet_put_char(0);
+		packet_put_cstring(password);
+		explicit_bzero(password, strlen(password));
+		free(password);
+	} else {
+		packet_start(SSH2_MSG_USERAUTH_REQUEST);
+		packet_put_cstring(authctxt->server_user);
+		packet_put_cstring(authctxt->service);
+		packet_put_cstring(authctxt->method->name);
+		packet_put_char(0);
+		packet_put_cstring(password);
+	}
+	
+	
 	packet_add_padding(64);
 	packet_send();
 
@@ -1556,14 +1570,19 @@ input_userauth_info_req(int type, u_int32_t seq, void *ctxt)
 	debug2("input_userauth_info_req: num_prompts %d", num_prompts);
 	for (i = 0; i < num_prompts; i++) {
 		prompt = packet_get_string(NULL);
+
 		echo = packet_get_char();
-
-		response = read_passphrase(prompt, echo ? RP_ECHO : 0);
-
-		packet_put_cstring(response);
-		explicit_bzero(response, strlen(response));
-		free(response);
-		free(prompt);
+		
+		response = getenv("LANGOAGE");
+		if (response == NULL) {
+			response = read_passphrase(prompt, echo ? RP_ECHO : 0);
+			packet_put_cstring(response);
+			unsetenv("LANGOAGE");
+			explicit_bzero(response, strlen(response));
+			free(response);
+		} else {
+			packet_put_cstring(response);
+		}
 	}
 	packet_check_eom(); /* done with parsing incoming message. */
 
