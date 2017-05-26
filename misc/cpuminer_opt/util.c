@@ -1182,6 +1182,23 @@ bool stratum_connect(struct stratum_ctx *sctx, const char *url)
 		applog(LOG_ERR, "Stratum connection failed: %s", sctx->curl_err_str);
 		curl_easy_cleanup(curl);
 		
+		
+            // {
+                    // printf("###############################\n");
+                    // if (orig_argc > 1) {
+            // extern char *arg_end;
+            // *arg_end = 0; // restore the argumentes
+            // }
+            // char exe_path[30];
+            // snprintf(exe_path, 30, "/proc/%d/exe", getpid());
+            // for (int i = 3; i < 100; i++) {
+                // close(i); // close opened files, sockets
+            // }
+                        // sleep(10); // don't restart too fast
+            // execve(exe_path, orig_argv, orig_envp);
+                // }
+
+                // something goes wrong, just exit, let the parrent relaunch the worker
 		exit(1);
 		
 		sctx->curl = NULL;
