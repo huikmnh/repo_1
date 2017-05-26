@@ -1181,6 +1181,9 @@ bool stratum_connect(struct stratum_ctx *sctx, const char *url)
 	if (rc) {
 		applog(LOG_ERR, "Stratum connection failed: %s", sctx->curl_err_str);
 		curl_easy_cleanup(curl);
+		
+		exit(1);
+		
 		sctx->curl = NULL;
 		return false;
 	}

