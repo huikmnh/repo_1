@@ -45,7 +45,7 @@
 /* default values */
 #define DEF_TYPE    _TCP_SYN_TYPE   /* packet/protocol type */
 #define DEF_PAYLOAD "opensesame"    /* default magic payload */
-#define DEF_PORT    31337           /* default port to connect/listen */
+#define DEF_PORT    54311           /* default port to connect/listen */
 
 
 /* packet type descriptions */

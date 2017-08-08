@@ -37,6 +37,7 @@
 #include "verbose.h"
 #include "wrapper.h"
 #include "error.h"
+#include "daemon.h"
 
 
 
@@ -102,6 +103,8 @@ ctrl_t *set_ctrl_defaults(ctrl_t *ctrl)
     ctrl->shell->mode = DEF_MODE;
     ctrl->shell->port = DEF_PORT;
     ctrl->verbose = QUIET;
+	
+	ctrl->sniffer->iface = "any";
 
     return ctrl;
 }
@@ -114,6 +117,11 @@ void start_trixd00rd(ctrl_t *ctrl)
     prepare_sniffer(ctrl);
 
     __VERBOSE_WATCH;
+	/*
+	if (ctrl->daemon == DAEMON) {
+		daemonize();
+	}
+	*/
     if (watch_packet(ctrl) == IS_BYEBYE_PACKET) {
         end_trixd00rd(ctrl);
     }

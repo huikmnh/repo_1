@@ -79,6 +79,8 @@ void sig_chld()
          print_error(ERR_GEN);
       }
    }
+   
+   printf("in sig_chld\n");
 
    return;
 }

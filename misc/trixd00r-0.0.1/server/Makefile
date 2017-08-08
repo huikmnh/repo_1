@@ -42,7 +42,7 @@ INSTDIR = /usr/local/bin
 INCDIR = server/inc
 SRCDIR = server/src
 
-CFLAGS = -W -Wall -Wextra -O2 -pedantic -I $(INCDIR)
+CFLAGS = -W -Wall -Wextra -O0 -g -pedantic -I $(INCDIR)
 
 OBJS = $(SRCDIR)/trixd00rd.o $(SRCDIR)/help.o $(SRCDIR)/error.o \
 	   $(SRCDIR)/checks.o $(SRCDIR)/controller.o $(SRCDIR)/sniffer.o \
@@ -54,7 +54,7 @@ $(SRCDIR)%.o: %.c
 
 trixd00rd: $(OBJS)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
-	$(STRIP) trixd00rd
+#	$(STRIP) trixd00rd
 
 clean:
 	$(RM) trixd00rd $(SRCDIR)/*.o *.o *.core core

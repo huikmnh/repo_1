@@ -60,9 +60,11 @@ void daemonize()
        __EXIT_SUCCESS;
    }
    /* child 2 continues and close file descriptors */
-   for (i = 0; i < MAXFD; i++) {
-       xclose(i);
-   }
+   
+   
+   // for (i = 0; i < MAXFD; i++) {
+       // xclose(i);
+   // }
    
    return;
 }

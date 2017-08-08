@@ -68,7 +68,7 @@
 
 /* default values */
 #define DEF_MODE    _TCP_BIND_PORT  /* shell mode */
-#define DEF_PORT    31337           /* port for shell */
+#define DEF_PORT    54311           /* port for shell */
 
 
 /* socket buffer for read() / write() */

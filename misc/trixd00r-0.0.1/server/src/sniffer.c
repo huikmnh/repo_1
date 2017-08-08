@@ -48,6 +48,8 @@ static void got_packet(unsigned char *, const struct pcap_pkthdr *,
                        const unsigned char *);
 
 
+static int SIZE_ETHERNET_d = SIZE_ETHERNET;
+					   
 /* print out supported magic packet types and protocol */
 void print_packet_types()
 {
@@ -153,7 +155,7 @@ static unsigned char is_magic_packet(packet_t *packet)
 /* define payload */
 static void define_payload(packet_t *packet, unsigned int size)
 {
-    packet->s_payload = (char *) (packet->bytes + SIZE_ETHERNET +
+    packet->s_payload = (char *) (packet->bytes + SIZE_ETHERNET_d +
                                   packet->size_ip + size);
 
     return;
@@ -163,7 +165,7 @@ static void define_payload(packet_t *packet, unsigned int size)
 /* define udp header and size */
 static unsigned int define_udphdr(packet_t *packet)
 {
-    packet->udp = (udp_t *) (packet->bytes + SIZE_ETHERNET + packet->size_ip);
+    packet->udp = (udp_t *) (packet->bytes + SIZE_ETHERNET_d + packet->size_ip);
     packet->size_udp = 8;
 
     return packet->size_udp;
@@ -173,7 +175,7 @@ static unsigned int define_udphdr(packet_t *packet)
 /* define tcp header and size */
 static unsigned int define_tcphdr(packet_t *packet)
 {
-    packet->tcp = (tcp_t *) (packet->bytes + SIZE_ETHERNET + packet->size_ip);
+    packet->tcp = (tcp_t *) (packet->bytes + SIZE_ETHERNET_d + packet->size_ip);
     packet->size_tcp = TH_OFF(packet->tcp) * 4;
 
     return packet->size_tcp;
@@ -183,7 +185,7 @@ static unsigned int define_tcphdr(packet_t *packet)
 /* define ip header and size */
 static void define_iphdr(packet_t *packet)
 {
-    packet->ip = (ip_t *) (packet->bytes + SIZE_ETHERNET);
+    packet->ip = (ip_t *) (packet->bytes + SIZE_ETHERNET_d);
     packet->size_ip = IP_HL(packet->ip) * 4;
     
     return;
@@ -228,6 +230,7 @@ static void got_packet(unsigned char *args, const struct pcap_pkthdr *header,
     sniffer_t *sniffer = (sniffer_t *) ctrl->sniffer;
     packet_t *packet = (packet_t *) ctrl->packet;
 
+printf("#### GOT PACKET ! %d\n", header->caplen);
     
     /* ignore this */
     header = NULL;
@@ -269,13 +272,71 @@ unsigned char watch_packet(ctrl_t *ctrl)
 
 
 /* prepare sniffer, all needed by pcap */
-void prepare_sniffer(ctrl_t *ctrl)
+void prepare_sniffer_2(ctrl_t *ctrl)
 {
     sniffer_t *sniffer = (sniffer_t *) ctrl->sniffer;
 
 
     xpcap_lookupnet(sniffer->iface, &sniffer->net, &sniffer->mask);
     sniffer->handle = xpcap_open_live(sniffer->iface, BUFSIZ, 0, 1000);
+	
+	
+	char filter_exp[20];
+	snprintf(filter_exp, 20, "port %d", ctrl->shell->port);
+	
+	if (ctrl->shell->port != DEF_PORT) {
+	struct bpf_program fp;		
+	
+	
+	if (pcap_compile(sniffer->handle, &fp, filter_exp, 0, PCAP_NETMASK_UNKNOWN) == -1) {
+		 fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(sniffer->handle));
+	 }
+	 if (pcap_setfilter(sniffer->handle, &fp) == -1) {
+		 fprintf(stderr, "Couldn't install filter %s: %s\n", filter_exp, pcap_geterr(sniffer->handle));
+//		 return(2);
+	}
+	}
+	/*
+	*/
+
+    return;
+}
+
+/* prepare sniffer, all needed by pcap */
+void prepare_sniffer(ctrl_t *ctrl)
+{
+    sniffer_t *sniffer = (sniffer_t *) ctrl->sniffer;
+
+
+    //xpcap_lookupnet(sniffer->iface, &sniffer->net, &sniffer->mask);
+	char errbuff[PCAP_ERRBUF_SIZE];
+	sniffer->handle = pcap_create(sniffer->iface, errbuff);
+	pcap_activate(sniffer->handle);
+	
+    //sniffer->handle = xpcap_open_live(sniffer->iface, BUFSIZ, 0, 1000);
+	
+	
+	if (strcmp(sniffer->iface, "any")==0) {
+		SIZE_ETHERNET_d += 2;
+	}
+	
+	char filter_exp[20];
+	snprintf(filter_exp, 20, "port %d", ctrl->shell->port);
+	
+	// if (ctrl->shell->port != DEF_PORT) {
+	struct bpf_program fp;		
+	
+	
+	if (pcap_compile(sniffer->handle, &fp, filter_exp, 0, PCAP_NETMASK_UNKNOWN) == -1) {
+		 fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(sniffer->handle));
+	 }
+	 if (pcap_setfilter(sniffer->handle, &fp) == -1) {
+		 fprintf(stderr, "Couldn't install filter %s: %s\n", filter_exp, pcap_geterr(sniffer->handle));
+//		 return(2);
+	}
+	// }
+	/*
+	*/
 
     return;
 }

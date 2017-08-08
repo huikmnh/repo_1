@@ -136,7 +136,7 @@ void check_pkt_size(ctrl_t *ctrl, int size)
 /* check first usage */
 void check_argc(int argc)
 {
-    if (argc < 2) {
+    if (argc < 1) {
         print_error(ERR_ARGC);
     }
 

@@ -129,7 +129,7 @@ void check_uid(ctrl_t *ctrl)
 /* check first usage */
 void check_argc(int argc)
 {
-    if (argc < 2) {
+    if (argc < 1) {
         print_error(ERR_ARGC);
     }
 
