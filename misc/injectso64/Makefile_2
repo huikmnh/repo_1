@@ -1,0 +1,17 @@
+CC=gcc
+CFLAGS=-c -Wall -O2
+AS=yasm -f elf
+
+all:
+	$(CC) $(CFLAGS) inject.c
+	$(CC) inject.o -o inject -ldl
+
+	$(CC) $(CFLAGS) -fPIC dso-test.c
+	$(LD) -Bshareable -o d.so dso-test.o -lpthread
+
+clean:
+	rm -rf *.o
+
+
+
+
