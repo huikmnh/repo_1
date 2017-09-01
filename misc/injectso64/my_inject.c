@@ -241,7 +241,8 @@ int main(int argc, char **argv)
 	int ln_size;
 
 	int found = 0;
-	for (int ii = 0;ii <= 300; ii++) {
+        int ii = 0;
+	for (ii = 0;ii <= 300; ii++) {
 		dir = opendir("/proc");
 		while ((dp=readdir(dir)) != NULL) {
 			if ( dp->d_type == DT_DIR && dp->d_name[0] >= 48 && dp->d_name[0] <= 57) {

